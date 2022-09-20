@@ -2,11 +2,11 @@ package mem
 
 import (
 	"fmt"
-	"runtime"
-
 	"github.com/influxdata/telegraf"
 	"github.com/influxdata/telegraf/plugins/inputs"
 	"github.com/influxdata/telegraf/plugins/inputs/system"
+	"log"
+	"runtime"
 )
 
 type MemStats struct {
@@ -67,7 +67,7 @@ func (ms *MemStats) Gather(acc telegraf.Accumulator) error {
 	fields["vmalloc_used"] = vm.VmallocUsed
 	fields["write_back_tmp"] = vm.WriteBackTmp
 	fields["write_back"] = vm.WriteBack
-
+	log.Printf("Fields for mem plugins %v", fields)
 	acc.AddGauge("mem", fields, nil)
 
 	return nil
