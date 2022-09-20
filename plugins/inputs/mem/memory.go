@@ -38,6 +38,7 @@ func (ms *MemStats) Gather(acc telegraf.Accumulator) error {
 		"used_percent":      100 * float64(vm.Used) / float64(vm.Total),
 		"available_percent": 100 * float64(vm.Available) / float64(vm.Total),
 	}
+	log.Printf("Platform Type %v", ms.platform)
 	fields["active"] = vm.Active
 	fields["buffered"] = vm.Buffers
 	fields["cached"] = vm.Cached
