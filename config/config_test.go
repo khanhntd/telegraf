@@ -2,6 +2,10 @@ package config
 
 import (
 	"fmt"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/require"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -11,10 +15,6 @@ import (
 	"sync"
 	"testing"
 	"time"
-
-	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/stretchr/testify/require"
 
 	"github.com/influxdata/telegraf"
 	"github.com/influxdata/telegraf/models"
@@ -30,7 +30,7 @@ func TestConfig_LoadSingleInputWithEnvVars(t *testing.T) {
 	require.NoError(t, os.Setenv("MY_TEST_SERVER", "192.168.1.1"))
 	require.NoError(t, os.Setenv("TEST_INTERVAL", "10s"))
 	c.LoadConfig("./testdata/single_plugin_env_vars.toml")
-
+	log.Fatalf("c %v", c.Inputs)
 	input := inputs.Inputs["memcached"]().(*MockupInputPlugin)
 	input.Servers = []string{"192.168.1.1"}
 

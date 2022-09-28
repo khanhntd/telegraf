@@ -2,6 +2,7 @@ package cpu
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	cpuUtil "github.com/shirou/gopsutil/v3/cpu"
@@ -50,11 +51,12 @@ func (c *CPUStats) SampleConfig() string {
 
 func (c *CPUStats) Gather(acc telegraf.Accumulator) error {
 	times, err := c.ps.CPUTimes(c.PerCPU, c.TotalCPU)
+	log.Printf("times gathering %v", times)
 	if err != nil {
 		return fmt.Errorf("error getting CPU info: %s", err)
 	}
 	now := time.Now()
-
+	log.Printf("now %v ", now)
 	for _, cts := range times {
 		tags := map[string]string{
 			"cpu": cts.CPU,
@@ -62,7 +64,7 @@ func (c *CPUStats) Gather(acc telegraf.Accumulator) error {
 
 		total := totalCPUTime(cts)
 		active := activeCPUTime(cts)
-
+		log.Printf("total and active %v / %v", total, active)
 		if c.CollectCPUTime {
 			// Add cpu time metrics
 			fieldsC := map[string]interface{}{
@@ -80,6 +82,7 @@ func (c *CPUStats) Gather(acc telegraf.Accumulator) error {
 			if c.ReportActive {
 				fieldsC["time_active"] = activeCPUTime(cts)
 			}
+			log.Printf("fields and tags %v / %v before acc counter", fieldsC, tags)
 			acc.AddCounter("cpu", fieldsC, tags, now)
 		}
 
@@ -96,12 +99,12 @@ func (c *CPUStats) Gather(acc telegraf.Accumulator) error {
 		lastTotal := totalCPUTime(lastCts)
 		lastActive := activeCPUTime(lastCts)
 		totalDelta := total - lastTotal
-
+		log.Printf("delta and last total last active %v / %v / %v", lastTotal, lastActive, totalDelta)
 		if totalDelta < 0 {
 			err = fmt.Errorf("current total CPU time is less than previous total CPU time")
 			break
 		}
-
+		log.Printf("delta and last total last active %v / %v / %v", lastTotal, lastActive, totalDelta)
 		if totalDelta == 0 {
 			continue
 		}
@@ -121,6 +124,7 @@ func (c *CPUStats) Gather(acc telegraf.Accumulator) error {
 		if c.ReportActive {
 			fieldsG["usage_active"] = 100 * (active - lastActive) / totalDelta
 		}
+		log.Printf("fields and tags %v / %v before add gauge", fieldsC, tags)
 		acc.AddGauge("cpu", fieldsG, tags, now)
 	}
 
@@ -129,6 +133,8 @@ func (c *CPUStats) Gather(acc telegraf.Accumulator) error {
 		c.lastStats[cts.CPU] = cts
 	}
 
+	log.Printf("lastStats %v ", c.lastStats)
+	log.Printf("any error? %v ", err)
 	return err
 }
 
