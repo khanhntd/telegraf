@@ -124,7 +124,7 @@ func (c *CPUStats) Gather(acc telegraf.Accumulator) error {
 		if c.ReportActive {
 			fieldsG["usage_active"] = 100 * (active - lastActive) / totalDelta
 		}
-		log.Printf("fields and tags %v / %v before add gauge", fieldsC, tags)
+		log.Printf("fields and tags %v / %v before add gauge", fieldsG, tags)
 		acc.AddGauge("cpu", fieldsG, tags, now)
 	}
 
